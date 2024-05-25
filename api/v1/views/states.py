@@ -7,7 +7,7 @@ from api.v1.views import app_views
 from models.state import State
 
 @app_views.route('/states/<string:id>')
-@app_views.route('/states/')
+@app_views.route('/states/', strict_slashes=False)
 def state_get(id=None):
     """CreateS a new view for State objects that handles 
     default RESTFul API actions
@@ -37,7 +37,7 @@ def delete_state(state_id):
         storage.save()
         return {}, 200
 
-@app_views.route('/states/', methods=['POST'])
+@app_views.route('/states', methods=['POST'], strict_slashes=False)
 def create_state():
     states_dict = request.get_json()
     
