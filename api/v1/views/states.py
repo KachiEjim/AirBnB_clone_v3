@@ -13,7 +13,6 @@ def state_get(id=None):
     default RESTFul API actions
     """
     if id is None:
-        print('1')
         states_list = []
         states = storage.all(State)
         for state in states.values():
@@ -21,10 +20,8 @@ def state_get(id=None):
         return jsonify(states_list)
     
     else:
-        print('2')
         state = storage.get(State, id)
         if state is None:
-            print('3')
             abort(404)
         else:
             return jsonify(state.to_dict())
