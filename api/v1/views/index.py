@@ -1,4 +1,5 @@
 #!/usr/bin/python3
+"""File doc"""
 from api.v1.views import app_views
 from flask import jsonify
 
