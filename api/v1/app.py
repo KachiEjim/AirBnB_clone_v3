@@ -3,10 +3,12 @@
 from flask import Flask, jsonify
 from models import storage
 from api.v1.views import app_views
+from flask_cors import CORS # to enable CORS
 import os
 
 
 app = Flask(__name__)
+CORS(app, resources={r"/*": {"origins": "0.0.0.0"}})  # Create a CORS instance
 
 
 app.register_blueprint(app_views)
