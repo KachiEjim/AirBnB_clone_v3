@@ -3,7 +3,7 @@
 from flask import Flask, jsonify
 from models import storage
 from api.v1.views import app_views
-from flask_cors import CORS # to enable CORS
+from flask_cors import CORS  # to enable CORS
 import os
 
 
@@ -24,7 +24,7 @@ def page_not_found(error):
 @app.teardown_appcontext
 def teardown_db(exception):
     """
-    A method to handle @app.teardown_appcontext 
+    A method to handle @app.teardown_appcontext
     that calls storage.close()
     """
     storage.close()
