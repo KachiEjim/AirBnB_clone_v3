@@ -42,6 +42,7 @@ def delete_state(state_id):
 
 @app_views.route('/states', methods=['POST'], strict_slashes=False)
 def create_state():
+    """Creates a new state object"""
     states_dict = request.get_json()
 
     if states_dict is None:
@@ -57,8 +58,10 @@ def create_state():
     return jsonify(new_state.to_dict()), 201
 
 
-@app_views.route('/states/<string:state_id>', methods=['PUT'])
+@app_views.route('/states/<string:state_id>',
+                 methods=['PUT'], strict_slashes=False)
 def update_state(state_id):
+    """Updates a state object"""
     state = storage.get(State, state_id)
 
     if state is None:
