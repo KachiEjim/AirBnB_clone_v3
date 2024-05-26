@@ -8,7 +8,7 @@ from models.state import State
 
 
 @app_views.route('/states/<string:id>')
-@app_views.route('/states/', strict_slashes=False)
+@app_views.route('/states/', methods=['GET'], strict_slashes=False)
 def state_get(id=None):
     """CreateS a new view for State objects that handles
     default RESTFul API actions
@@ -27,7 +27,7 @@ def state_get(id=None):
             return jsonify(state.to_dict())
 
 
-@app_views.route('/states/<string:state_id>', methods=['DELETE'])
+@app_views.route('/states/<string:state_id>', methods=['DELETE'], strict_slashes=False)
 def delete_state(state_id):
     """Method deletes a State object"""
     state = storage.get(State, state_id)
