@@ -10,7 +10,7 @@ from models.state import State
 @app_views.route('/states/', strict_slashes=False)
 @app_views.route('/states/<string:id>')
 def state_get(id=None):
-    """CreateS a new view for State objects that handles 
+    """CreateS a new view for State objects that handles
     default RESTFul API actions
     """
     if id is None:
@@ -19,7 +19,6 @@ def state_get(id=None):
         for state in states.values():
             states_list.append(state.to_dict())
         return jsonify(states_list)
-    
     else:
         key = 'State.' + id
         state = storage.get(State, key)
@@ -27,6 +26,7 @@ def state_get(id=None):
             abort(404)
         else:
             return jsonify(state.to_dict())
+
 
 @app_views.route('/states/<string:state_id>', methods=['DELETE'])
 def delete_state(state_id):
@@ -40,20 +40,21 @@ def delete_state(state_id):
         storage.save()
         return {}, 200
 
+
 @app_views.route('/states', methods=['POST'], strict_slashes=False)
 def create_state():
     states_dict = request.get_json()
-    
+
     if states_dict is None:
         abort(400, 'Not a JSON')
-    
+
     if 'name' not in states_dict.keys():
         abort(400, 'Missing name')
-    
+
     new_state = State(**states_dict)
     storage.new(new_state)
     storage.save()
-    
+
     return jsonify(new_state.to_dict()), 201
 
 
