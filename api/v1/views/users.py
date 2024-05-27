@@ -52,6 +52,7 @@ def create_user():
     password = user_dict['password']
     hashed_password = hashlib.md5(password.encode()).hexdigest()
     user_dict.update({'password': hashed_password})
+    print(f'create {hashed_password}')
     new_user = User(**user_dict)
     storage.new(new_user)
     storage.save()
@@ -72,6 +73,7 @@ def update_user(user_id):
     if password is not None:
         hashed_password = hashlib.md5(password.encode()).hexdigest()
         user_dict.update({'password': hashed_password})
+        print(f'update {hashed_password}')
     for key, value in user_dict.items():
         if key not in ['id', 'email', 'created_at', 'updated_at']:
             setattr(user, key, value)
