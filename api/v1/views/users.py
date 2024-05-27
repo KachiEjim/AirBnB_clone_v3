@@ -1,7 +1,6 @@
 #!/usr/bin/python3
 """Users objects that handles all default RestFul API actions"""
 
-import hashlib
 from flask import jsonify, abort, request
 from models import storage
 from api.v1.views import app_views
@@ -49,9 +48,6 @@ def create_user():
         abort(400, 'Missing email')
     if 'password' not in user_dict.keys():
         abort(400, 'Missing password')
-    password = user_dict['password']
-    hashed_password = hashlib.md5(password.encode()).hexdigest()
-    user_dict.update({'password': hashed_password})
     new_user = User(**user_dict)
     storage.new(new_user)
     storage.save()
@@ -68,10 +64,6 @@ def update_user(user_id):
     user_dict = request.get_json()
     if user_dict is None:
         abort(400, 'Not a JSON')
-    password = user_dict.get('password')
-    if password is not None:
-        hashed_password = hashlib.md5(password.encode()).hexdigest()
-        user_dict.update({'password': hashed_password})
     for key, value in user_dict.items():
         if key not in ['id', 'email', 'created_at', 'updated_at']:
             setattr(user, key, value)
