@@ -84,3 +84,29 @@ def update_place(place_id):
             setattr(place, key, value)
     storage.save()
     return jsonify(place.to_dict())
+
+
+@app_views.route('/places_search', methods=['POST'], strict_slashes=False)
+def search_place(place_dict):
+    """Search a Place"""
+    places_list = []
+    places = storage.all(Place).values()
+    for place in places:
+        for key, value in place_dict.items():
+            if key == 'amenities':
+                if all(amenity in place.amenities for amenity in value):
+                    places_list.append(place.to_dict())
+            elif key == 'name':
+                if value in place.name:
+                    places_list.append(place.to_dict())
+            elif key == 'city_id':
+                if value == place.city_id:
+                    places_list.append(place.to_dict())
+            elif key == 'user_id':
+                if value == place.user_id:
+                    places_list.append(place.to_dict())
+    return places_list
+
+
+if __name__ == '__main__':
+    pass
