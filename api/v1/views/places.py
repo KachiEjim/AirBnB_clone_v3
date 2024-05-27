@@ -87,25 +87,41 @@ def update_place(place_id):
 
 
 @app_views.route('/places_search', methods=['POST'], strict_slashes=False)
-def search_place(place_dict):
-    """Search a Place"""
-    places_list = []
-    places = storage.all(Place).values()
-    for place in places:
-        for key, value in place_dict.items():
-            if key == 'amenities':
-                if all(amenity in place.amenities for amenity in value):
-                    places_list.append(place.to_dict())
-            elif key == 'name':
-                if value in place.name:
-                    places_list.append(place.to_dict())
-            elif key == 'city_id':
-                if value == place.city_id:
-                    places_list.append(place.to_dict())
-            elif key == 'user_id':
-                if value == place.user_id:
-                    places_list.append(place.to_dict())
-    return places_list
+def search_places():
+    """Searches for Place objects based on the JSON in the request body"""
+    search_data = request.get_json()
+    if not search_data:
+        abort(400, 'Not a JSON')
+    
+    # Query all places
+    all_places = storage.all(Place).values()
+
+    # Filter places based on search data
+    filtered_places = []
+    for place in all_places:
+        if all(getattr(place, key, None) == value for key, value in search_data.items()):
+            filtered_places.append(place.to_dict())
+
+    return jsonify(filtered_places)
+# def search_place(place_dict):
+#     """Search a Place"""
+#     places_list = []
+#     places = storage.all(Place).values()
+#     for place in places:
+#         for key, value in place_dict.items():
+#             if key == 'amenities':
+#                 if all(amenity in place.amenities for amenity in value):
+#                     places_list.append(place.to_dict())
+#             elif key == 'name':
+#                 if value in place.name:
+#                     places_list.append(place.to_dict())
+#             elif key == 'city_id':
+#                 if value == place.city_id:
+#                     places_list.append(place.to_dict())
+#             elif key == 'user_id':
+#                 if value == place.user_id:
+#                     places_list.append(place.to_dict())
+#     return places_list
 
 
 if __name__ == '__main__':
