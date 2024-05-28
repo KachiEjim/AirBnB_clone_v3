@@ -7,6 +7,8 @@ from api.v1.views import app_views
 from models.place import Place
 from models.city import City
 from models.user import User
+from models.state import State
+from models.amenity import Amenity
 
 
 @app_views.route('/cities/<string:city_id>/places', methods=['GET'],
@@ -86,42 +88,64 @@ def update_place(place_id):
     return jsonify(place.to_dict())
 
 
-@app_views.route('/places_search', methods=['POST'], strict_slashes=False)
-def search_places():
-    """Searches for Place objects based on the JSON in the request body"""
-    search_data = request.get_json()
-    if not search_data:
+@app_views.route('/places_search',
+                 methods=['POST'],
+                 strict_slashes=False)
+def places_search():
+    """Search for place according to parameters
+    in body request
+    """
+    # POST REQUEST
+    if request.is_json:  # check is request is valid json
+        body = request.get_json()
+    else:
         abort(400, 'Not a JSON')
-    
-    # Query all places
-    all_places = storage.all(Place).values()
 
-    # Filter places based on search data
-    filtered_places = []
-    for place in all_places:
-        if all(getattr(place, key, None) == value for key, value in search_data.items()):
-            filtered_places.append(place.to_dict())
+    place_list = []
 
-    return jsonify(filtered_places)
-# def search_place(place_dict):
-#     """Search a Place"""
-#     places_list = []
-#     places = storage.all(Place).values()
-#     for place in places:
-#         for key, value in place_dict.items():
-#             if key == 'amenities':
-#                 if all(amenity in place.amenities for amenity in value):
-#                     places_list.append(place.to_dict())
-#             elif key == 'name':
-#                 if value in place.name:
-#                     places_list.append(place.to_dict())
-#             elif key == 'city_id':
-#                 if value == place.city_id:
-#                     places_list.append(place.to_dict())
-#             elif key == 'user_id':
-#                 if value == place.user_id:
-#                     places_list.append(place.to_dict())
-#     return places_list
+    # if states searched
+    if 'states' in body:
+        for state_id in body['states']:
+            state = storage.get(State, state_id)
+            if state is not None:
+                for city in state.cities:
+                    for place in city.places:
+                        place_list.append(place)
+
+    # if cities searched
+    if 'cities' in body:
+        for city_id in body['cities']:
+            city = storage.get(City, city_id)
+            if city is not None:
+                for place in city.places:
+                    place_list.append(place)
+
+    # if 'amenities' present
+    if 'amenities' in body and len(body['amenities']) > 0:
+        if len(place_list) == 0:
+            place_list = [place for place in storage.all(Place).values()]
+        del_list = []
+        for place in place_list:
+            for amenity_id in body['amenities']:
+                amenity = storage.get(Amenity, amenity_id)
+                if amenity not in place.amenities:
+                    del_list.append(place)
+                    break
+        for place in del_list:
+            place_list.remove(place)
+
+    if len(place_list) == 0:
+        place_list = [place for place in storage.all(Place).values()]
+
+    # convert objs to dict and remove 'amenities' key
+    place_list = [place.to_dict() for place in place_list]
+    for place in place_list:
+        try:
+            del place['amenities']
+        except KeyError:
+            pass
+
+    return jsonify(place_list)
 
 
 if __name__ == '__main__':

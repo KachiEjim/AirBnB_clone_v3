@@ -82,7 +82,5 @@ def update_review(review_id):
     return jsonify(review.to_dict())
 
 
-
-
 if __name__ == '__main__':
     pass
